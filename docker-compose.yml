@@ -1,0 +1,53 @@
+version: '2'
+services:
+        #  mariadb:
+        #    image: mariadb:latest
+        #    restart: always
+        #    container_name: mariadb
+        #    hostname: mariadb
+        #    restart: always
+        #    volumes:
+        #     - /mnt/nextcloud/db:/var/lib/mysql
+        #    environment:
+        #     - MYSQL_ROOT_PASSWORD=
+        #     - MYSQL_DATABASE=
+        #     - MYSQL_USER=
+        #     - MYSQL_PASSWORD=
+  simplesamlphp:
+    image: unicon/simplesamlphp
+    restart: always
+    expose:
+     - 80
+    environment:
+     - VIRTUAL_HOST=lt.eap.litnet.lt
+     - LETSENCRYPT_HOST=lt.eap.litnet.lt
+     - LETSENCRYPT_EMAIL=admins-linux@litnet.lt
+  nginx:
+    restart: always
+    image: jwilder/nginx-proxy
+    container_name: nginx
+    hostname: nginx
+    restart: always
+    ports:
+     - "80:80"
+     - "443:443"
+    volumes:
+     - /var/run/docker.sock:/tmp/docker.sock:ro
+     - /mnt/nginx/certs:/etc/nginx/certs:ro
+     - /mnt/nginx/conf.d:/etc/nginx/conf.d
+     - /etc/nginx/vhost.d
+     - /usr/share/nginx/html
+    labels:
+     - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true
+    environment:
+     - DEFAULT_HOST=lt.eap.litnet.lt
+  letsencrypt:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    restart: always
+    volumes_from:
+     - nginx
+    volumes:
+     - /mnt/nginx/certs:/etc/nginx/certs:rw
+     - /var/run/docker.sock:/var/run/docker.sock:ro
