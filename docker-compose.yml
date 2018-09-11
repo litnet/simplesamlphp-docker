@@ -9,8 +9,8 @@ services:
     expose:
      - 80
     environment:
-     - VIRTUAL_HOST=lt.eap.litnet.lt
-     - LETSENCRYPT_HOST=lt.eap.litnet.lt
+     - VIRTUAL_HOST=CC.eap.litnet.lt
+     - LETSENCRYPT_HOST=CC.eap.litnet.lt
      - LETSENCRYPT_EMAIL=admins-linux@litnet.lt
     volumes:
      - /simplesamlphp
@@ -46,7 +46,7 @@ services:
     labels:
      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true
     environment:
-     - DEFAULT_HOST=lt.eap.litnet.lt
+     - DEFAULT_HOST=CC.eap.litnet.lt
   letsencrypt:
     restart: always
     image: jrcs/letsencrypt-nginx-proxy-companion
