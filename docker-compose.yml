@@ -1,20 +1,10 @@
 version: '2'
 services:
-        #  mariadb:
-        #    image: mariadb:latest
-        #    restart: always
-        #    container_name: mariadb
-        #    hostname: mariadb
-        #    restart: always
-        #    volumes:
-        #     - /mnt/nextcloud/db:/var/lib/mysql
-        #    environment:
-        #     - MYSQL_ROOT_PASSWORD=
-        #     - MYSQL_DATABASE=
-        #     - MYSQL_USER=
-        #     - MYSQL_PASSWORD=
   simplesamlphp:
-    image: unicon/simplesamlphp
+    build: ./simplesamlphp/
+    restart: always
+    hostname: simplesamlphp
+    container_name: simplesamlphp
     restart: always
     expose:
      - 80
@@ -22,19 +12,35 @@ services:
      - VIRTUAL_HOST=lt.eap.litnet.lt
      - LETSENCRYPT_HOST=lt.eap.litnet.lt
      - LETSENCRYPT_EMAIL=admins-linux@litnet.lt
-  nginx:
+    volumes:
+     - /simplesamlphp
+  php:
+    build: ./fpm/
+    hostname: php-fpm
+    container_name: php-fpm
+    expose:
+     - "9000"
+    volumes_from:
+     - simplesamlphp
+  memcache-server:
+    hostname: memcache-server
+    container_name: memcache-server
+    image: memcached
+    expose:
+     - "11211"
+  nginx-proxy:
     restart: always
     image: jwilder/nginx-proxy
-    container_name: nginx
-    hostname: nginx
+    container_name: nginx-proxy
+    hostname: nginx-proxy
     restart: always
     ports:
      - "80:80"
      - "443:443"
     volumes:
      - /var/run/docker.sock:/tmp/docker.sock:ro
-     - /mnt/nginx/certs:/etc/nginx/certs:ro
-     - /mnt/nginx/conf.d:/etc/nginx/conf.d
+     - /srv/nginx/certs/:/etc/nginx/certs
+     - /etc/nginx/conf.d
      - /etc/nginx/vhost.d
      - /usr/share/nginx/html
     labels:
@@ -45,9 +51,10 @@ services:
     restart: always
     image: jrcs/letsencrypt-nginx-proxy-companion
     container_name: letsencrypt
+    hostname: letsencrypt
     restart: always
     volumes_from:
-     - nginx
+     - nginx-proxy
     volumes:
-     - /mnt/nginx/certs:/etc/nginx/certs:rw
+     - /srv/nginx/certs/:/etc/nginx/certs:rw
      - /var/run/docker.sock:/var/run/docker.sock:ro
