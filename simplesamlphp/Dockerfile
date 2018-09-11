@@ -44,7 +44,7 @@ RUN apt-get purge -y \
     apt-get clean
 
 COPY nginx-site.conf /etc/nginx/conf.d/nginx-site.conf
-COPY simplesamlphp-overwrites /simplesamlphp/
+COPY simplesamlphp-overrides /simplesamlphp/
 RUN mkdir /var/www && echo "Hello world!" > /var/www/index.html && \
     chown -R www-data:www-data /var/www && \
     chown -R www-data:www-data /simplesamlphp
