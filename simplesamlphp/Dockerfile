@@ -1,6 +1,6 @@
 FROM nginx:stable
 
-ENV SSP_VERSION="1.16.1"
+ENV SSP_VERSION="1.16.0"
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends --no-install-suggests \
